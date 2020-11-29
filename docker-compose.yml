@@ -1,0 +1,35 @@
+version: '3.7'
+
+services: 
+    php-apache:
+        build: #building php-apache image based on dockerfile in ./dockerfile-php
+            context: ./dockerfile-php
+        container_name: apache-server
+        networks:
+            - backend
+            - frontend
+        ports: #bind port 10020 to 80
+            - 10020:80
+        volumes: #mount directory with soure code to proper directory on apache server
+            - ./src:/var/www/html
+        links: #link to mysql container
+            - 'mysql'
+    mysql: #build mysql server from latest image
+        image: mysql:latest
+        container_name: db-server
+        networks:
+            - backend
+        volumes: #create volume for db
+            - db:/var/lib/mysql
+        environment: #setup necessary environment variables
+            TZ: 'Europe/Warsaw'
+            MYSQL_ALLOW_EMPTY_PASSOWRD: 'no'
+            MYSQL_ROOT_PASSWORT: 'root'
+            MYSQL_USER: 'user'
+            MYSQL_PASSWORD: 'user'
+            MYSQL_DB: 'testdb'
+volumes:
+    db:
+networks:
+    frontend:
+    backend:
